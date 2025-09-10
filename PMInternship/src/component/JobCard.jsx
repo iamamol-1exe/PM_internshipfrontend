@@ -3,14 +3,13 @@ import "./JobCard.css"; // We'll create this file for styling
 
 const JobCard = ({ job }) => {
   // Destructure the props for easier access
-  const { title, company, location, skills, description, salary } = job;
-  console.log(title, company);
-
+  const { title, company, location, skills, description, salary, id } = job;
   return (
     <div className="job-card">
       <div className="job-header">
         <h2 className="job-title">{title}</h2>
         <p className="company-name">{company}</p>
+        <p className="font-bold ">{id}</p>
       </div>
 
       <div className="job-meta">

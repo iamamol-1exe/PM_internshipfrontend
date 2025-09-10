@@ -32,7 +32,8 @@ const LandingPage = () => {
         console.log(responseData);
         const normalizedJobs = Array.isArray(responseData)
           ? responseData.map((job) => ({
-              title: job.jobRole,
+              id: job.id,
+              title: job.title,
               company: job.company,
               location: job.preferred_location,
               skills: job.skills,
