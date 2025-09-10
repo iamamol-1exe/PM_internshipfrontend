@@ -1,11 +1,25 @@
 const mysql = require("mysql2/promise");
-module.exports.connectToDb = async () => {
+
+// Create a connection pool
+const pool = mysql.createPool({
+  host: process.env.HOST || "localhost",
+  user: process.env.USER || "root",
+  password: "root",
+  database: process.env.DATABASE || "Sih",
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+});
+
+// Initialize database function - to be called once when app starts
+module.exports.initDb = async () => {
   try {
     const host = process.env.HOST || "localhost";
     const user = process.env.USER || "root";
     const password = "root";
     const db = process.env.DATABASE || "Sih";
 
+    // Create a temporary connection to check if the database exists
     let connection = await mysql.createConnection({
       host: host,
       user: user,
@@ -26,18 +40,31 @@ module.exports.connectToDb = async () => {
     // Close initial connection
     await connection.end();
 
-    // Reconnect with the database specified
-    connection = await mysql.createConnection({
-      host: host,
-      user: user,
-      password: password,
-      database: db,
-    });
-
-    console.log(`Connected to database '${db}'`);
-    return connection;
+    console.log(`Connected to database '${db}' pool`);
+    return true;
   } catch (err) {
-    console.error("Error connecting to database:", err);
+    console.error("Error initializing database:", err);
+    throw err;
+  }
+};
+
+// Get a connection from the pool
+module.exports.getConnection = async () => {
+  try {
+    return await pool.getConnection();
+  } catch (err) {
+    console.error("Error getting connection from pool:", err);
+    throw err;
+  }
+};
+
+// Execute a query using the pool directly
+module.exports.query = async (sql, params) => {
+  try {
+    const [results] = await pool.query(sql, params);
+    return results;
+  } catch (err) {
+    console.error("Error executing query:", err);
     throw err;
   }
 };

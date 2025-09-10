@@ -1,17 +1,10 @@
 const { validationResult } = require("express-validator");
-const connectToDb = require("../db/connectToDb");
-const { connection } = require("../server");
+const dbUtils = require("../db/connectToDb");
 
 module.exports.getAllInternships = async (req, res) => {
   try {
-    const conn = await connectToDb.connectToDb();
-    if (!conn) {
-      return res
-        .status(500)
-        .json({ success: false, message: "Database connection failed" });
-    }
     const sql = "SELECT * FROM INTERNSHIPS";
-    const [rows] = await conn.query(sql);
+    const rows = await dbUtils.query(sql);
     return res.status(200).json({ success: true, data: rows });
   } catch (err) {
     console.log(err);
@@ -23,11 +16,6 @@ module.exports.getAllInternships = async (req, res) => {
   }
 };
 
-// It's a best practice to manage your database connection with a pool
-// This should be initialized once when your application starts.
-// For example, in your main server file (e.g., app.js or index.js):
-// const dbPool = require('./config/database'); // Assuming you create a pool utility
-
 module.exports.addInternships = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -38,25 +26,30 @@ module.exports.addInternships = async (req, res) => {
   }
 
   // Destructure the body for clarity
-  const { title, description, stipend, preferred_location } = req.body;
+  const { title, description, stipend, preferred_location, company } = req.body;
   let skills = req.body.skills; // Use 'let' as we might modify it
 
-  // FIX 1: Convert skills to a string *before* using it in the query
+  // Convert skills to a string if it's an array
   if (Array.isArray(skills)) {
     skills = skills.join(", ");
   }
 
-  // FIX 2: It's better to get a connection from a pool and release it
-  let conn; // Define connection outside try to access it in finally
+  let conn;
   try {
-    // Assuming connectToDb is now a pool from which you get a connection
-    conn = await connectToDb.connectToDb();
+    // Get a connection from the pool
+    conn = await dbUtils.getConnection();
 
     const sql =
-      "INSERT INTO internships (title, description, skills, stipend, preferred_location) VALUES(?, ?, ?, ?, ?)";
+      "INSERT INTO internships (title, description, skills, stipend, preferred_location, company) VALUES(?, ?, ?, ?, ?, ?)";
 
-    // Use the processed 'skills' variable here
-    const values = [title, description, skills, stipend, preferred_location];
+    const values = [
+      title,
+      description,
+      skills,
+      stipend,
+      preferred_location,
+      company,
+    ];
 
     await conn.query(sql, values);
 
@@ -65,14 +58,13 @@ module.exports.addInternships = async (req, res) => {
       .json({ success: true, message: "Internship added successfully" });
   } catch (err) {
     console.error("Error occurred while adding internship:", err);
-    // FIX 3: Provide a clearer error message
     return res.status(500).json({
       success: false,
       message: "An error occurred while adding the internship.",
       error: err.message,
     });
   } finally {
-    // FIX 4: CRITICAL - Always release the connection back to the pool
+    // Release the connection back to the pool
     if (conn) {
       conn.release();
     }

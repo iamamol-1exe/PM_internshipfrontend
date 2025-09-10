@@ -17,6 +17,7 @@ router.post(
       .withMessage("Description is required"),
     body("skills").isArray(),
     body("stipend").isNumeric().withMessage("Stipend must be a number"),
+    body("company").trim().isString(),
   ],
   internshipController.addInternships
 );

@@ -7,7 +7,7 @@ module.exports.getRecommendation = async (req, res) => {
     return res.status(401).json({ Errors: errors });
   }
   const { jobRole, education, skills, location } = req.body;
- 
+
   if (!jobRole || !education || !skills || !location) {
     return res.status(400).json({
       message:
@@ -23,8 +23,8 @@ module.exports.getRecommendation = async (req, res) => {
   }
   try {
     const url = process.env.RECOMMANDATION;
-    let skillsText = skills.join(", ");
-    const query = jobRole + " " + education + " " + skillsText + " " + location;
+    let skillsText = skills.join(" ");
+    const query = skillsText;
     const result = await axios.post(url, {
       query: query,
     });
@@ -35,6 +35,6 @@ module.exports.getRecommendation = async (req, res) => {
     console.error("Error occured when the Getting Recommendation", error);
     return res
       .status(401)
-      .json({ message: "Erorr ocuured at geting recommendation" });
+      .json({ message: "Erorr ocuured at getting recommendation" });
   }
 };

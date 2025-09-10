@@ -20,7 +20,7 @@ def add_internship_with_embedding(title, description, skills, stipend, preferred
     from app.models import Internship
     
     # Generate embedding from the description 
-    text_to_encode = skills + " " + title
+    text_to_encode = skills # only using skills for comparison
     embedding = model.encode(text_to_encode, convert_to_numpy=True)
     # Normalize the embedding
     embedding_norm = embedding / np.linalg.norm(embedding)
@@ -57,7 +57,7 @@ def update_embeddings_for_existing_internships():
     for internship in internships:
         if internship.skills:
             # Generate embedding from the description
-            text_to_encode = internship.skills + " " + internship.title
+            text_to_encode = internship.skills # only using skills for comparison
             embedding = model.encode(text_to_encode , convert_to_numpy=True)
             # Normalize the embedding
             embedding_norm = embedding / np.linalg.norm(embedding)
