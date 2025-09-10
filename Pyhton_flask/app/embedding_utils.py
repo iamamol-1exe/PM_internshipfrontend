@@ -2,7 +2,7 @@ from app import db, model
 import pickle
 import numpy as np
 
-def add_internship_with_embedding(title, description, skills, stipend, preferred_location):
+def add_internship_with_embedding(title, description, skills, stipend, preferred_location, company=None):
     """
     Add a new internship with automatically generated embedding.
     
@@ -12,14 +12,16 @@ def add_internship_with_embedding(title, description, skills, stipend, preferred
         skills (str): Required skills for the internship
         stipend (str): Stipend information
         preferred_location (str): Preferred location for the internship
+        company (str, optional): Company offering the internship
         
     Returns:
         Internship: The created internship object
     """
     from app.models import Internship
     
-    # Generate embedding from the description
-    embedding = model.encode(description, convert_to_numpy=True)
+    # Generate embedding from the description 
+    text_to_encode = skills + " " + title
+    embedding = model.encode(text_to_encode, convert_to_numpy=True)
     # Normalize the embedding
     embedding_norm = embedding / np.linalg.norm(embedding)
     # Pickle the embedding
@@ -32,6 +34,7 @@ def add_internship_with_embedding(title, description, skills, stipend, preferred
         skills=skills,
         stipend=stipend,
         preferred_location=preferred_location,
+        company=company,
         embedding=pickled_embedding
     )
     
@@ -52,9 +55,10 @@ def update_embeddings_for_existing_internships():
     count = 0
     
     for internship in internships:
-        if internship.description:
+        if internship.skills:
             # Generate embedding from the description
-            embedding = model.encode(internship.description, convert_to_numpy=True)
+            text_to_encode = internship.skills + " " + internship.title
+            embedding = model.encode(text_to_encode , convert_to_numpy=True)
             # Normalize the embedding
             embedding_norm = embedding / np.linalg.norm(embedding)
             # Pickle the embedding

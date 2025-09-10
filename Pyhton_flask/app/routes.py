@@ -40,13 +40,25 @@ def register_routes(app):
         faiss.normalize_L2(query_emb)
         scores, indices = index.search(query_emb, top_k)
 
+        from app.models import Internship
+        
         results = []
         for idx, score in zip(indices[0], scores[0]):
-            results.append({
-                "id": internship_ids[idx],
-                "description": internship_texts[idx],
-                "score": float(score)
-            })
+            internship_id = internship_ids[idx]
+            # Fetch the complete internship data from database
+            internship = Internship.query.get(internship_id)
+            
+            if internship:
+                results.append({
+                    "id": internship.internship_id,
+                    "title": internship.title,
+                    "description": internship.description,
+                    "skills": internship.skills,
+                    "stipend": internship.stipend,
+                    "preferred_location": internship.preferred_location,
+                    "company": internship.company if hasattr(internship, 'company') else None,
+                    "score": float(score)
+                })
 
         return jsonify({"results": results})
         
@@ -67,7 +79,8 @@ def register_routes(app):
                 description=data["description"],
                 skills=data["skills"],
                 stipend=data["stipend"],
-                preferred_location=data["preferred_location"]
+                preferred_location=data["preferred_location"],
+                company=data.get("company")  # Optional field
             )
             
             # Reinitialize the search system with new internship
@@ -83,3 +96,17 @@ def register_routes(app):
             
         except Exception as e:
             return jsonify({"error": str(e)}), 500
+
+    @app.route("/retrain",methods=["POST"])
+    def retrain_model():
+        try:
+            from app.models import Internship
+            from app import init_system
+            init_system(Internship)
+
+            return jsonify({
+                "success": True, 
+                "message": "Search index rebuilt successfully with all available internship data"
+            }), 200
+        except Exception as e :
+            return jsonify({"success": False, "error": str(e)}), 500

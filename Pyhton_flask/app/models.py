@@ -9,6 +9,7 @@ class Internship(db.Model):
     skills = db.Column(db.String(255))
     stipend = db.Column(db.String(100))
     preferred_location = db.Column(db.String(255))
+    company = db.Column(db.String(255))
     embedding = db.Column(db.LargeBinary)
 
     def __repr__(self):

@@ -10,6 +10,8 @@ model = None
 index = None
 internship_ids = []
 internship_texts = []
+internship_skills = []
+internship_locations = []
 parsed_internships = []
 
 def create_app():
@@ -35,7 +37,7 @@ def create_app():
     return app
 
 def init_system(Internship):
-    global model, index, internship_ids, internship_texts
+    global model, index, internship_ids, internship_texts, internship_skills, internship_locations
 
     # Load model
     model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -44,10 +46,14 @@ def init_system(Internship):
     internships = Internship.query.all()
     internship_ids.clear()
     internship_texts.clear()
+    internship_skills.clear()
+    internship_locations.clear()
     embeddings = []
     for i in internships:
         internship_ids.append(i.internship_id)
+        internship_skills.append(i.skills)
         internship_texts.append(i.description)
+        internship_locations.append(i.preferred_location)
         if i.embedding is not None:
             embeddings.append(pickle.loads(i.embedding))
 

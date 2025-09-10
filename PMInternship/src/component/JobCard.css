@@ -1,0 +1,117 @@
+.job-card {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 600px;
+  margin: 20px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background-color: #ffffff;
+  transition: box-shadow 0.3s ease;
+}
+
+.job-card:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.job-header {
+  margin-bottom: 16px;
+}
+
+.job-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: #1a1a1a;
+}
+
+.company-name {
+  font-size: 1.1rem;
+  color: #555;
+  margin: 0;
+}
+
+.job-meta {
+  display: flex;
+  gap: 20px;
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.job-description {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.skills-section {
+  margin-bottom: 24px;
+}
+
+.skills-heading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.skills-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.skill-tag {
+  background-color: #eef5ff;
+  color: #3b82f6;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.skill-tag:hover {
+  background-color: #dbeafe;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.no-skills {
+  font-size: 0.9rem;
+  color: #777;
+  font-style: italic;
+}
+
+.job-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 16px;
+}
+
+.posted-time {
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.apply-button {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.apply-button:hover {
+  background-color: #1d4ed8;
+}
