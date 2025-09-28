@@ -3,6 +3,8 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("path");
 const recommendationRoutes = require("./routes/recommendation.route");
+const userRoutes = require("./routes/user.router");
+const adminRoutes = require("./routes/admin.router");
 
 const internshipRoutes = require("./routes/internship.route");
 
@@ -19,6 +21,8 @@ app.use(
 );
 app.use("/api/recommend", recommendationRoutes);
 app.use("/api/internships", internshipRoutes);
+app.use("/api/user", userRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {
   res.send("Server is Online");
