@@ -61,13 +61,14 @@ export default function RegistrationPage() {
         userType: formData.userType,
       };
       const url = import.meta.env.VITE_API_REGISTER_URL;
-      const response = await axios.post(url, payload);
+      await axios.post(url, payload);
 
       setSuccess("Registration successful! Redirecting to login...");
       setTimeout(() => {
         navigate("/login");
       }, 2000);
     } catch (err) {
+      console.error(err);
       setError(
         err.response?.data?.message || "Registration failed. Please try again."
       );

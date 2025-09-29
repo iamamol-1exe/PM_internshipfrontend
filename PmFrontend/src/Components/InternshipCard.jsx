@@ -39,7 +39,6 @@ const InternshipCard = ({ jobTitle, company, experience, salary, location, descr
     return (
         <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-shadow duration-300 p-5 border border-gray-100 flex flex-col sm:flex-row items-start gap-5">
             {/* Checkbox */}
-            <input type="checkbox" className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
             
             <div className="flex-1">
                 {/* Header */}

@@ -9,7 +9,7 @@ module.exports.initDb = async () => {
   try {
     const host = process.env.HOST || "localhost";
     const user = process.env.USER || "root";
-    const password = process.env.PASSWORD;
+    const password = process.env.PASSWORD || "root";
     const db = process.env.DATABASE || "Sih";
 
     // Create a temporary connection to check if the database exists (This part still works)
@@ -37,7 +37,7 @@ module.exports.initDb = async () => {
     pool = mysql.createPool({
       host: host,
       user: user,
-      password: password, 
+      password: password,
       database: db,
       waitForConnections: true,
       connectionLimit: 10,
@@ -68,7 +68,7 @@ module.exports.query = async (sql, params) => {
   try {
     // This now relies on pool being initialized by initDb()
     // ESSENTIAL FIX: Use regex to replace all whitespace (including newlines) with a single space and then trim.
-    const cleanedSql = sql.replace(/\s+/g, ' ').trim();
+    const cleanedSql = sql.replace(/\s+/g, " ").trim();
     const [results] = await pool.query(cleanedSql, params);
     return results;
   } catch (err) {
