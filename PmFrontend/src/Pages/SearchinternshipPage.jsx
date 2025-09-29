@@ -27,6 +27,10 @@ export default function StudentDashboard() {
     interest: "",
   });
   const [isLoadingSkills, setIsLoadingSkills] = useState(false);
+  const [recommendations, setRecommendations] = useState([]);
+  const [isLoadingRecommendations, setIsLoadingRecommendations] =
+    useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
 
   // Function to get skills from user profile
   const getSkillsFromProfile = async () => {
@@ -76,11 +80,77 @@ export default function StudentDashboard() {
     }
   };
 
+  // Function to get recommendations from API
+  const getRecommendations = async () => {
+    setIsLoadingRecommendations(true);
+    try {
+      // Parse skills string into array
+      const skillsArray = formData.skills
+        ? formData.skills
+            .split(",")
+            .map((skill) => skill.trim())
+            .filter((skill) => skill)
+        : [];
+
+      const requestData = {
+        jobRole: formData.name || "Software Developer",
+        education:
+          formData.education === "Any Education" ? "Btech" : formData.education,
+        skills: skillsArray,
+        location: formData.location || "pune",
+      };
+
+      console.log("Sending request:", requestData);
+
+      const response = await axios.post(
+        "http://localhost:4000/api/recommend",
+        requestData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200 && response.data.data.results) {
+        // Transform API response to match our component structure
+        const transformedRecommendations = response.data.data.results.map(
+          (item, index) => ({
+            id: item.id || index + 1,
+            jobTitle: item.title,
+            company: item.company,
+            experience: "0-2 Yrs", // Default as API doesn't provide this
+            salary: item.stipend ? `₹${item.stipend}/month` : "Not disclosed",
+            location: item.preferred_location,
+            description: item.description,
+            tags: item.skills ? item.skills.split(", ") : [],
+            postedDate: "Recently", // Default as API doesn't provide this
+            logoUrl: `https://placehold.co/48x48/e2e8f0/333?text=${item.company.charAt(
+              0
+            )}`,
+            score: item.score,
+          })
+        );
+
+        setRecommendations(transformedRecommendations);
+        setHasSearched(true);
+      }
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+      alert(
+        "Failed to get recommendations. Please check if the API server is running."
+      );
+    } finally {
+      setIsLoadingRecommendations(false);
+    }
+  };
+
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const recommendations = [
+  // Default recommendations for initial display
+  const defaultRecommendations = [
     {
       id: 1,
       jobTitle: "Fullstack Developer",
@@ -263,9 +333,17 @@ export default function StudentDashboard() {
               </div>
             </div>
             <div className="w-full md:w-auto">
-              <button className="w-full md:w-auto bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg flex items-center justify-center transition-transform transform hover:scale-105 shadow-md hover:shadow-lg">
+              <button
+                onClick={getRecommendations}
+                disabled={isLoadingRecommendations}
+                className="w-full md:w-auto bg-green-500 hover:bg-green-600 disabled:bg-gray-400 text-white font-bold py-3 px-8 rounded-lg flex items-center justify-center transition-transform transform hover:scale-105 shadow-md hover:shadow-lg disabled:transform-none disabled:shadow-md"
+              >
                 <SearchIcon />
-                <span className="ml-2">Search Internships</span>
+                <span className="ml-2">
+                  {isLoadingRecommendations
+                    ? "Searching..."
+                    : "Search Internships"}
+                </span>
               </button>
             </div>
           </div>
@@ -274,13 +352,44 @@ export default function StudentDashboard() {
         {/* --- Recommendations Section --- */}
         <div>
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center md:text-left">
-            Your Top Recommendations
+            {hasSearched
+              ? "Your Personalized Recommendations"
+              : "Sample Recommendations"}
           </h2>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {recommendations.slice(0, recommendationCount).map((internship) => (
-              <InternshipCard key={internship.id} {...internship} />
-            ))}
-          </div>
+
+          {isLoadingRecommendations ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+              <span className="ml-4 text-gray-600">
+                Getting your recommendations...
+              </span>
+            </div>
+          ) : recommendations.length > 0 ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {recommendations
+                .slice(0, recommendationCount)
+                .map((internship) => (
+                  <InternshipCard key={internship.id} {...internship} />
+                ))}
+            </div>
+          ) : hasSearched ? (
+            <div className="text-center py-20">
+              <div className="text-gray-500 text-lg mb-4">
+                No recommendations found
+              </div>
+              <p className="text-gray-400">
+                Try adjusting your search criteria or skills
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {defaultRecommendations
+                .slice(0, recommendationCount)
+                .map((internship) => (
+                  <InternshipCard key={internship.id} {...internship} />
+                ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
