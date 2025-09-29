@@ -38,6 +38,7 @@ module.exports.userRegisterController = async (req, res) => {
       fullname,
       email,
       hashedPassword,
+      userType, // <-- FIX: Added the missing userType parameter
     ]);
 
     // Generate JWT token
@@ -284,6 +285,3 @@ module.exports.updateUserProfileController = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
-
-

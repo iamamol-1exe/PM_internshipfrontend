@@ -21,7 +21,12 @@ app.use(
 );
 app.use("/api/recommend", recommendationRoutes);
 app.use("/api/internships", internshipRoutes);
+
+// FIX: Setting the prefix to "/api/user" to match the frontend request:
+// Client request: /api/user/updateProfile
+// Route defined: /updateProfile
 app.use("/api/user", userRoutes);
+
 app.use("/api/admin", adminRoutes);
 
 app.get("/", (req, res) => {

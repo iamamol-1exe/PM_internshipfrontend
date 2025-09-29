@@ -1,5 +1,6 @@
-import React from "react";
-
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
 // --- Icons (can be reused from your other files) ---
 const GoogleIcon = () => (
   <svg className="w-5 h-5 mr-3" viewBox="0 0 48 48">
@@ -33,12 +34,50 @@ const GitHubIcon = () => (
 );
 
 export default function RegistrationPage() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    password: "",
+    userType: "student",
+  });
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    try {
+      const payload = {
+        fullname: formData.fullname,
+        email: formData.email,
+        password: formData.password,
+        userType: formData.userType,
+      };
+      const url = import.meta.env.VITE_API_REGISTER_URL;
+      const response = await axios.post(url, payload);
+
+      setSuccess("Registration successful! Redirecting to login...");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+    } catch (err) {
+      setError(
+        err.response?.data?.message || "Registration failed. Please try again."
+      );
+    }
+  };
+
   return (
-    // This new outer div uses flexbox to center the card on the page
-    <div className="w-full flex justify-center items-center p-4 sm:p-6 lg:p-8">
+    <div className="w-full flex justify-center items-center min-h-screen p-4 sm:p-6 lg:p-8">
       <div className="font-sans w-full max-w-6xl">
         <div className="flex flex-col lg:flex-row rounded-2xl shadow-2xl overflow-hidden bg-white">
-          {/* Left Panel */}
           <div className="w-full lg:w-1/2 bg-[#E9E9D8] flex items-center justify-center p-8 lg:p-12">
             <div className="bg-white/80 backdrop-blur-sm p-8 sm:p-12 rounded-3xl shadow-2xl max-w-md text-center">
               <img
@@ -57,7 +96,6 @@ export default function RegistrationPage() {
             </div>
           </div>
 
-          {/* Right Panel: Registration Form */}
           <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
             <div className="w-full max-w-md">
               <h2 className="text-3xl font-bold text-gray-800 mb-2 text-center">
@@ -66,21 +104,50 @@ export default function RegistrationPage() {
               <p className="text-gray-500 mb-8 text-center">
                 Get started in just a few steps.
               </p>
-
-              <form>
+              <form onSubmit={handleSubmit}>
+                <div className="flex justify-center bg-gray-100 rounded-lg p-1 mb-6">
+                  <button
+                    type="button"
+                    className={`w-full py-2 rounded-md font-semibold transition-colors duration-300 ${
+                      formData.userType === "student"
+                        ? "bg-green-500 text-white shadow"
+                        : "text-gray-600"
+                    }`}
+                    onClick={() =>
+                      setFormData({ ...formData, userType: "student" })
+                    }
+                  >
+                    Student
+                  </button>
+                  <button
+                    type="button"
+                    className={`w-full py-2 rounded-md font-semibold transition-colors duration-300 ${
+                      formData.userType === "admin"
+                        ? "bg-green-500 text-white shadow"
+                        : "text-gray-600"
+                    }`}
+                    onClick={() =>
+                      setFormData({ ...formData, userType: "admin" })
+                    }
+                  >
+                    Admin
+                  </button>
+                </div>
                 <div className="mb-4">
                   <label
                     className="block text-gray-700 text-sm font-bold mb-2"
-                    htmlFor="full-name"
+                    htmlFor="fullname"
                   >
                     Full Name
                   </label>
                   <input
-                    id="full-name"
+                    id="fullname"
                     type="text"
                     required
                     placeholder="Enter your Full Name"
-                    className="w-full px-4 text-black py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 transition duration-200"
+                    value={formData.fullname}
+                    onChange={handleChange}
+                    className="w-full px-4 text-black py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
@@ -95,7 +162,9 @@ export default function RegistrationPage() {
                     type="email"
                     required
                     placeholder="Enter your Email"
-                    className="w-full text-black px-4 py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 transition duration-200"
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full text-black px-4 py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div className="mb-4">
@@ -107,26 +176,38 @@ export default function RegistrationPage() {
                   </label>
                   <input
                     id="password"
-                    required
                     type="password"
+                    required
                     placeholder="Create a Password"
-                    className="w-full text-black px-4 py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 transition duration-200"
+                    value={formData.password}
+                    onChange={handleChange}
+                    className="w-full text-black px-4 py-3 bg-gray-100 border-transparent rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-green-500 text-black font-bold py-3 px-4 rounded-lg hover:bg-green-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-800 transition-all duration-300"
+                  className="w-full bg-green-500 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300"
                 >
                   Register
                 </button>
+                {error && (
+                  <p className="text-center text-sm text-red-600 mt-4">
+                    {error}
+                  </p>
+                )}
+                {success && (
+                  <p className="text-center text-sm text-green-600 mt-4">
+                    {success}
+                  </p>
+                )}
                 <p className="text-center text-sm text-gray-600 mt-4">
                   Already have an account?{" "}
-                  <a
-                    href="#"
+                  <Link
+                    to="/login"
                     className="font-medium text-blue-600 hover:underline"
                   >
                     Log in
-                  </a>
+                  </Link>
                 </p>
               </form>
             </div>

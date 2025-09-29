@@ -48,8 +48,9 @@ router.get("/logout", userLogoutController);
 
 router.get("/profile", authenticate, getUserProfileController);
 
-router.post(
-  "/updateProfile", 
+// FIX: Changed router.post to router.put to match the client (UserProfilePage.jsx)
+router.put(
+  "/updateProfile",
   [
     body("fullname")
       .optional()
@@ -76,12 +77,9 @@ router.post(
       .optional()
       .isFloat({ min: 0, max: 10 })
       .withMessage("CGPA must be a valid number between 0 and 10"),
-    body("skills")
-      .optional()
-      .isArray()
-      .withMessage("Skills must be an array")
-  ], 
-  authenticate, 
+    body("skills").optional().isArray().withMessage("Skills must be an array"),
+  ],
+  authenticate,
   updateUserProfileController
 );
 

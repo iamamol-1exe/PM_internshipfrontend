@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { Link } from 'react-router-dom';
+// This import path is corrected. It assumes your file is at 'src/context/AuthContext.jsx'
+import { AuthContext } from '../context/AuthContext';
 
 // --- Reusable Icons ---
 const ArrowRightIcon = () => (
@@ -8,13 +11,20 @@ const ArrowRightIcon = () => (
 );
 
 // --- Landing Page Component ---
-export default function LandingPage({ onNavigate }) {
+export default function LandingPage() {
+    // Get the authentication state from the context
+    const { isAuthenticated } = useContext(AuthContext);
+
     const featuredInternships = [
         { id: 1, title: 'Product Manager Intern', company: 'Innovate Inc.', location: 'Pune', type: 'Full-time', logo: 'https://placehold.co/40x40/e2e8f0/333?text=I' },
         { id: 2, title: 'Data Analyst Intern', company: 'DataDriven Co.', location: 'Remote', type: 'Part-time', logo: 'https://placehold.co/40x40/e2e8f0/333?text=D' },
         { id: 3, title: 'UX/UI Design Intern', company: 'Creative Solutions', location: 'Mumbai', type: 'Full-time', logo: 'https://placehold.co/40x40/e2e8f0/333?text=C' },
     ];
     
+    // Determine the correct path for the buttons based on login status
+    const getStartedPath = isAuthenticated ? '/searchinternships' : '/login';
+    const browsePath = '/searchinternships';
+
     return (
         <div className="font-sans text-gray-800">
             {/* --- Hero Section --- */}
@@ -27,26 +37,26 @@ export default function LandingPage({ onNavigate }) {
                         Our AI-powered platform matches you with exclusive product management internships at top companies across India. Build your profile and get personalized recommendations today.
                     </p>
                     <div className="flex justify-center gap-4">
-                        <button onClick={() => onNavigate('login')} className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 inline-flex items-center">
+                        <Link to={getStartedPath} className="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg transition-transform transform hover:scale-105 inline-flex items-center">
                             Get Started <ArrowRightIcon />
-                        </button>
-                        <button className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg border border-gray-300 transition-transform transform hover:scale-105">
+                        </Link>
+                        <Link to={browsePath} className="bg-white hover:bg-gray-100 text-gray-800 font-bold py-3 px-8 rounded-lg border border-gray-300 transition-transform transform hover:scale-105">
                             Browse Internships
-                        </button>
+                        </Link>
                     </div>
                 </div>
             </section>
 
             {/* --- Featured Internships --- */}
             <section className="pt-8 pb-16 bg-gray-50">
-                 <div className="container mx-auto px-4">
+                <div className="container mx-auto px-4">
                     <div className="text-center mb-12">
                         <h2 className="text-3xl md:text-4xl font-bold">Featured Internships</h2>
                         <p className="text-gray-600 mt-2 max-w-2xl mx-auto">Here are some of the top opportunities available right now from leading companies.</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {featuredInternships.map(internship => (
-                             <div key={internship.id} className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                            <div key={internship.id} className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col">
                                 <div className="flex-grow">
                                     <div className="flex items-center mb-4">
                                         <img src={internship.logo} alt={`${internship.company} logo`} className="w-10 h-10 rounded-full mr-4 bg-gray-200" />
@@ -68,4 +78,3 @@ export default function LandingPage({ onNavigate }) {
         </div>
     );
 };
-
